@@ -50,3 +50,19 @@ for idx in top_indices:
     print(chunks[idx])
 
 generator = pipeline("text-generation", model="distilgpt2")
+
+context = " ".join([chunks[idx] for idx in top_indices])
+
+prompt = f"""
+Use the following context to answer the question.
+
+Context:
+{context}
+
+Question:
+{query}
+
+Answer:
+"""
+
+response = generator(prompt, max_length=200, num_return_sequences=1)
