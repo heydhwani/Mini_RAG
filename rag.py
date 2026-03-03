@@ -9,7 +9,23 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 with open("data.txt", "r") as f:
     text = f.read()
 
-chunks = text.split("\n")
+def chunk_text(text, chunk_size=50, overlap=10):
+    words = text.split()
+    chunks = []
+    
+    step = chunk_size - overlap
+    
+    for i in range(0, len(words), step):
+        chunk = words[i:i + chunk_size]
+        chunks.append(" ".join(chunk))
+        
+        if i + chunk_size >= len(words):
+            break
+            
+    return chunks
+
+
+chunks = chunk_text(text)
 
 chunk_embeddings = model.encode(chunks)
 
