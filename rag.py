@@ -18,3 +18,5 @@ query = input("Ask a question: ")
 query_embedding = model.encode([query])
 
 similarities = cosine_similarity(query_embedding, chunk_embeddings)
+
+best_match_index = np.argmax(similarities)
