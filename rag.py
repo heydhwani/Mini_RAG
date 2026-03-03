@@ -49,7 +49,7 @@ for idx in top_indices:
     print(f"\nScore: {similarities[0][idx]:.4f}")
     print(chunks[idx])
 
-generator = pipeline("text2text-generation", model="google/flan-t5-small")
+generator = pipeline("text-generation", model="google/flan-t5-small")
 
 context = " ".join([chunks[idx] for idx in top_indices])
 
@@ -66,5 +66,5 @@ Answer:
 """
 
 response = generator(prompt, max_length=150)
-
+print("\nGenerated Answer:\n")
 print(response[0]["generated_text"])
