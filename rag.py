@@ -14,3 +14,5 @@ chunks = text.split("\n")
 chunk_embeddings = model.encode(chunks)
 
 query = input("Ask a question: ")
+
+query_embedding = model.encode([query])
