@@ -1,71 +1,117 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
-# Load embedding model
-model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# Step 1: Read file
-with open("data.txt", "r") as f:
+embed_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
+model_llm = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+
+
+with open("data.txt", "r", encoding="utf-8") as f:
     text = f.read()
+
 
 def chunk_text(text, chunk_size=40, overlap=5):
     words = text.split()
     chunks = []
-    
     step = chunk_size - overlap
-    
+
     for i in range(0, len(words), step):
         chunk = words[i:i + chunk_size]
         chunks.append(" ".join(chunk))
-        
+
         if i + chunk_size >= len(words):
             break
-            
+
     return chunks
 
 chunks = chunk_text(text)
 
-print("\nGenerated Chunks:")
-for idx, chunk in enumerate(chunks):
-    print(f"\nChunk {idx}:\n{chunk}")
+print(f"\nTotal Chunks Created: {len(chunks)}")
 
 
-chunks = chunk_text(text)
+chunk_embeddings = embed_model.encode(chunks)
 
-chunk_embeddings = model.encode(chunks)
 
-query = input("Ask a question: ")
+while True:
+    query = input("\nAsk a question (type 'exit' to quit): ").strip()
 
-query_embedding = model.encode([query])
+    if query.lower() == "exit":
+        print("Exiting RAG system...")
+        break
 
-similarities = cosine_similarity(query_embedding, chunk_embeddings)
+    # Create query embedding
+    query_embedding = embed_model.encode([query])
 
-top_indices = np.argsort(similarities[0])[-3:][::-1]
+    # Calculate similarity
+    similarities = cosine_similarity(query_embedding, chunk_embeddings)
 
-print("\nTop 3 Relevant Chunks:")
-for idx in top_indices:
-    print(f"\nScore: {similarities[0][idx]:.4f}")
-    print(chunks[idx])
+    # Get top 3 most similar chunks
+    top_indices = np.argsort(similarities[0])[-3:][::-1]
 
-generator = pipeline("text-generation", model="google/flan-t5-small")
+    print("\nTop Relevant Chunks:")
+    for idx in top_indices:
+        print(f"\nScore: {similarities[0][idx]:.4f}")
+        print(chunks[idx])
 
-context = " ".join([chunks[idx] for idx in top_indices])
+    
+    # Apply Similarity Threshold
+    
+    threshold = 0.40
+    filtered_indices = [
+        idx for idx in top_indices
+        if similarities[0][idx] > threshold
+    ]
 
-prompt = f"""
-Use the following context to answer the question.
-If the answer is not present in the context, say "I don't know."
+    if not filtered_indices:
+        print("\nNo strong match found in context.")
+        continue
+
+    # Combine selected chunks
+    context = " ".join([chunks[idx] for idx in filtered_indices])
+
+    
+    # 8️⃣ Create Prompt
+    
+    prompt = f"""
+You are a helpful AI assistant.
+
+Answer the question in a complete sentence.
+Use ONLY the information from the context.
+Do not give short or one-word answers.
 
 Context:
 {context}
 
-Question:
-{query}
+Question: {query}
 
 Answer:
 """
 
-response = generator(prompt, max_new_tokens=100)
-print("\nGenerated Answer:\n")
-print(response[0]["generated_text"])
+    
+    # Generate Answer
+    
+    inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
+
+    outputs = model_llm.generate(
+        **inputs,
+        max_new_tokens=80,
+        min_new_tokens=10,
+        do_sample=False
+    )
+
+    answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    print("\nGenerated Answer:\n")
+    print(answer)
+
+    
+    # Show Source Chunks
+    
+    print("\nSource Chunks Used:")
+    for idx in filtered_indices:
+        print(f"- Chunk {idx}")
