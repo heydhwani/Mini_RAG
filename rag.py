@@ -1,6 +1,7 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from transformers import pipeline
 
 # Load embedding model
 model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -9,7 +10,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 with open("data.txt", "r") as f:
     text = f.read()
 
-def chunk_text(text, chunk_size=50, overlap=10):
+def chunk_text(text, chunk_size=10, overlap=2):
     words = text.split()
     chunks = []
     
@@ -24,6 +25,12 @@ def chunk_text(text, chunk_size=50, overlap=10):
             
     return chunks
 
+chunks = chunk_text(text)
+
+print("\nGenerated Chunks:")
+for idx, chunk in enumerate(chunks):
+    print(f"\nChunk {idx}:\n{chunk}")
+
 
 chunks = chunk_text(text)
 
@@ -35,7 +42,11 @@ query_embedding = model.encode([query])
 
 similarities = cosine_similarity(query_embedding, chunk_embeddings)
 
-best_match_index = np.argmax(similarities)
+top_indices = np.argsort(similarities[0])[-3:][::-1]
 
-print("\nMost Relevant Chunk:")
-print(chunks[best_match_index])
+print("\nTop 3 Relevant Chunks:")
+for idx in top_indices:
+    print(f"\nScore: {similarities[0][idx]:.4f}")
+    print(chunks[idx])
+
+generator = pipeline("text-generation", model="distilgpt2")
