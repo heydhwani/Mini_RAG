@@ -20,3 +20,6 @@ query_embedding = model.encode([query])
 similarities = cosine_similarity(query_embedding, chunk_embeddings)
 
 best_match_index = np.argmax(similarities)
+
+print("\nMost Relevant Chunk:")
+print(chunks[best_match_index])
