@@ -16,3 +16,5 @@ chunk_embeddings = model.encode(chunks)
 query = input("Ask a question: ")
 
 query_embedding = model.encode([query])
+
+similarities = cosine_similarity(query_embedding, chunk_embeddings)
