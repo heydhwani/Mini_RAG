@@ -10,3 +10,7 @@ with open("data.txt", "r") as f:
     text = f.read()
 
 chunks = text.split("\n")
+
+chunk_embeddings = model.encode(chunks)
+
+query = input("Ask a question: ")
