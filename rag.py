@@ -10,7 +10,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 with open("data.txt", "r") as f:
     text = f.read()
 
-def chunk_text(text, chunk_size=10, overlap=2):
+def chunk_text(text, chunk_size=40, overlap=5):
     words = text.split()
     chunks = []
     
