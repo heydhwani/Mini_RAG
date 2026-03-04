@@ -6,12 +6,14 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 docs_path = "docs"
 documents = []
+doc_names = []
 
 for file in os.listdir(docs_path):
     if file.endswith(".txt"):
         with open(os.path.join(docs_path, file), "r", encoding="utf-8") as f:
             text = f.read()
             documents.append(text)
+            doc_names.append(file)
 
 print("Documents loaded:", len(documents))
 
