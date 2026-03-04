@@ -93,7 +93,7 @@ while True:
         print(f"\nChunk {idx}:")
         print(all_chunks[idx])
         source_doc = chunk_sources[idx]
-        print("Source document:", source_doc)
+        print("Source:", doc_names[source_doc])
 
     # Combine context
     context = " ".join([all_chunks[idx] for idx in top_indices])
