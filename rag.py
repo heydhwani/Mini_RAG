@@ -22,8 +22,6 @@ tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
 model_llm = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 
 
-with open("data.txt", "r", encoding="utf-8") as f:
-    text = f.read()
 
 
 def chunk_text(text, chunk_size=40, overlap=5):
@@ -40,10 +38,14 @@ def chunk_text(text, chunk_size=40, overlap=5):
 
     return chunks
 
+all_chunks = []
 
-chunks = chunk_text(text)
+for doc in documents:
+    chunks = chunk_text(doc)
+    all_chunks.extend(chunks)
 
-print(f"\nTotal Chunks Created: {len(chunks)}")
+
+print(f"\nTotal Chunks Created: {len(all_chunks)}")
 
 
 chunk_embeddings = embed_model.encode(chunks)
