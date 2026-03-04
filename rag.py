@@ -39,6 +39,8 @@ chunk_embeddings = embed_model.encode(chunks)
 chunk_embeddings = np.array(chunk_embeddings).astype("float32")
 dimension = chunk_embeddings.shape[1]   
 index = faiss.IndexFlatL2(dimension)
+index.add(chunk_embeddings)
+distances, indices = index.search(query_embedding, 3)
 
 
 while True:
