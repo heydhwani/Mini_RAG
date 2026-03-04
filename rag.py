@@ -38,11 +38,18 @@ def chunk_text(text, chunk_size=40, overlap=5):
 
     return chunks
 
+chunk_sources = []
 all_chunks = []
 
-for doc in documents:
+all_chunks = []
+chunk_sources = []
+
+for i, doc in enumerate(documents):
     chunks = chunk_text(doc)
-    all_chunks.extend(chunks)
+
+    for chunk in chunks:
+        all_chunks.append(chunk)
+        chunk_sources.append(i)
 
 
 print(f"\nTotal Chunks Created: {len(all_chunks)}")
@@ -83,6 +90,8 @@ while True:
     for idx in top_indices:
         print(f"\nChunk {idx}:")
         print(all_chunks[idx])
+        source_doc = chunk_sources[idx]
+        print("Source document:", source_doc)
 
     # Combine context
     context = " ".join([all_chunks[idx] for idx in top_indices])
