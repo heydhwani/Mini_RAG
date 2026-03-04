@@ -1,0 +1,5 @@
+Artificial Intelligence (AI) is the simulation of human intelligence in machines that are programmed to think and learn. AI systems can perform tasks such as problem-solving, decision-making, speech recognition, and visual perception.
+
+AI is widely used in many industries including healthcare, finance, transportation, and education. For example, AI helps doctors detect diseases earlier, assists banks in fraud detection, and powers recommendation systems used by platforms like Netflix and Amazon.
+
+AI can be categorized into three main types: Narrow AI, General AI, and Super AI. Narrow AI is designed for a specific task such as voice assistants like Siri or Alexa. General AI refers to machines that can perform any intellectual task that a human can do. Super AI is a hypothetical concept where machines surpass human intelligence.

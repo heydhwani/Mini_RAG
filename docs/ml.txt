@@ -1,0 +1,5 @@
+Machine Learning (ML) is a subset of Artificial Intelligence that allows computers to learn from data without being explicitly programmed. Instead of following fixed instructions, machine learning models identify patterns in data and improve their performance over time.
+
+There are three main types of machine learning: supervised learning, unsupervised learning, and reinforcement learning. Supervised learning uses labeled data to train models. Unsupervised learning finds hidden patterns in unlabeled data. Reinforcement learning trains agents through rewards and penalties.
+
+Machine learning is used in many real-world applications such as spam email detection, recommendation systems, fraud detection, and self-driving cars. It plays a crucial role in modern data-driven systems.
