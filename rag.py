@@ -1,8 +1,19 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import os
 import faiss
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+docs_path = "docs"
+documents = []
+
+for file in os.listdir(docs_path):
+    if file.endswith(".txt"):
+        with open(os.path.join(docs_path, file), "r", encoding="utf-8") as f:
+            text = f.read()
+            documents.append(text)
+
+print("Documents loaded:", len(documents))
 
 embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 
