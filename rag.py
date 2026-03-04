@@ -48,7 +48,7 @@ for doc in documents:
 print(f"\nTotal Chunks Created: {len(all_chunks)}")
 
 
-chunk_embeddings = embed_model.encode(chunks)
+chunk_embeddings = embed_model.encode(all_chunks)
 chunk_embeddings = np.array(chunk_embeddings).astype("float32")
 
 
@@ -74,7 +74,7 @@ while True:
     query_embedding = np.array(query_embedding).astype("float32")
 
     
-    k = min(3, len(chunks))
+    k = min(3, len(all_chunks))
     distances, indices = index.search(query_embedding, k)
 
     top_indices = indices[0]
@@ -82,10 +82,10 @@ while True:
     print("\nTop Relevant Chunks:")
     for idx in top_indices:
         print(f"\nChunk {idx}:")
-        print(chunks[idx])
+        print(all_chunks[idx])
 
     # Combine context
-    context = " ".join([chunks[idx] for idx in top_indices])
+    context = " ".join([all_chunks[idx] for idx in top_indices])
 
     
     prompt = f"""
