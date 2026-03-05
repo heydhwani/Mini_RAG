@@ -100,9 +100,7 @@ while True:
 
     
     prompt = f"""
-You are an AI tutor.
-
-Use the context to answer the question in 3-4 clear sentences.
+Answer the question using the given context.
 
 Context:
 {context}
@@ -110,17 +108,18 @@ Context:
 Question:
 {query}
 
-Answer:
+Write a clear explanation in 3 sentences.
 """
 
     
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
 
     outputs = model_llm.generate(
-        **inputs,
-        max_new_tokens=200,
-        do_sample=False
-    )
+    **inputs,
+    max_new_tokens=150,
+    num_beams=4,
+    early_stopping=True
+)
 
     answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 

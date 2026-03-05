@@ -60,7 +60,7 @@ for file in os.listdir(docs_path):
             doc_names.append(file)
 
 
-def chunk_text(text, chunk_size=40, overlap=5):
+def chunk_text(text, chunk_size=120, overlap=20):
 
     words = text.split()
     chunks = []
@@ -127,9 +127,7 @@ if st.button("Get Answer"):
 
 
         prompt = f"""
-You are a helpful AI assistant.
-
-Answer clearly using the provided context.
+Answer the question using the given context.
 
 Context:
 {context}
@@ -137,16 +135,16 @@ Context:
 Question:
 {query}
 
-Answer:
+Write a clear explanation in 3 sentences.
 """
-
 
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
 
         outputs = model_llm.generate(
             **inputs,
-            max_new_tokens=100,
-            do_sample=False
+            max_new_tokens=120,
+            num_beams=4,
+            early_stopping=True
         )
 
         answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
