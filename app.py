@@ -7,11 +7,33 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
+st.set_page_config(page_title="AI Knowledge Assistant", page_icon="🧠")
 
-st.title("🧠 RAG Document Question Answering")
 
+st.title("🧠 AI Knowledge Assistant")
 st.write("Ask questions about Artificial Intelligence, Machine Learning, and RAG.")
 
+
+# Sidebar
+st.sidebar.header("ℹ️ Instructions")
+st.sidebar.write(
+"""
+1️⃣ Ask a question related to AI or ML  
+2️⃣ The system retrieves relevant knowledge  
+3️⃣ AI generates a clear answer
+"""
+)
+
+st.sidebar.header("💡 Example Questions")
+example_questions = [
+"What is Machine Learning?",
+"Explain Artificial Intelligence",
+"What is Retrieval Augmented Generation?",
+"Difference between AI and ML?"
+]
+
+for q in example_questions:
+    st.sidebar.write("•", q)
 
 
 @st.cache_resource
@@ -25,7 +47,6 @@ def load_models():
 embed_model, tokenizer, model_llm = load_models()
 
 
-
 docs_path = "docs"
 
 documents = []
@@ -37,9 +58,6 @@ for file in os.listdir(docs_path):
             text = f.read()
             documents.append(text)
             doc_names.append(file)
-
-st.write("📄 Loaded Documents:", doc_names)
-
 
 
 def chunk_text(text, chunk_size=40, overlap=5):
@@ -60,8 +78,6 @@ def chunk_text(text, chunk_size=40, overlap=5):
     return chunks
 
 
-
-
 all_chunks = []
 chunk_sources = []
 
@@ -78,8 +94,6 @@ chunk_embeddings = embed_model.encode(all_chunks)
 chunk_embeddings = np.array(chunk_embeddings).astype("float32")
 
 
-
-
 dimension = chunk_embeddings.shape[1]
 
 index = faiss.IndexFlatL2(dimension)
@@ -87,13 +101,12 @@ index = faiss.IndexFlatL2(dimension)
 index.add(chunk_embeddings)
 
 
+st.subheader("❓ Ask a Question")
 
-st.subheader("Ask a Question")
-
-query = st.text_input("Enter your question:")
+query = st.text_input("Type your question here")
 
 
-if st.button("Ask"):
+if st.button("Get Answer"):
 
     if query == "":
         st.warning("Please enter a question")
@@ -109,30 +122,14 @@ if st.button("Ask"):
 
         top_indices = indices[0]
 
-        st.subheader("Retrieved Context")
 
-        sources_used = set()
-
-        for idx in top_indices:
-
-            st.write(all_chunks[idx])
-
-            source_doc = chunk_sources[idx]
-
-            sources_used.add(doc_names[source_doc])
-
-            st.write("Source:", doc_names[source_doc])
-            st.write("---")
-
-
-        # CREATE CONTEXT
         context = " ".join([all_chunks[idx] for idx in top_indices])
 
 
         prompt = f"""
 You are a helpful AI assistant.
 
-Answer the question clearly using ONLY the context.
+Answer clearly using the provided context.
 
 Context:
 {context}
@@ -148,17 +145,12 @@ Answer:
 
         outputs = model_llm.generate(
             **inputs,
-            max_new_tokens=80,
+            max_new_tokens=100,
             do_sample=False
         )
 
         answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 
-        st.subheader("Answer")
-        st.write(answer)
-
-
-        st.subheader("Sources")
-        for s in sources_used:
-            st.write("📄", s)
+        st.subheader("💡 Answer")
+        st.success(answer)

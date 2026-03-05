@@ -26,7 +26,7 @@ model_llm = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
 
 
 
-def chunk_text(text, chunk_size=40, overlap=5):
+def chunk_text(text, chunk_size=120, overlap=20):
     words = text.split()
     chunks = []
     step = chunk_size - overlap
@@ -100,15 +100,15 @@ while True:
 
     
     prompt = f"""
-You are a helpful AI assistant.
+You are an AI tutor.
 
-Answer the question clearly using ONLY the context.
-If the answer is not in the context, say "I don't know."
+Use the context to answer the question in 3-4 clear sentences.
 
 Context:
 {context}
 
-Question: {query}
+Question:
+{query}
 
 Answer:
 """
@@ -118,7 +118,7 @@ Answer:
 
     outputs = model_llm.generate(
         **inputs,
-        max_new_tokens=80,
+        max_new_tokens=200,
         do_sample=False
     )
 
