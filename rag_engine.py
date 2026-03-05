@@ -12,7 +12,7 @@ class RAGEngine:
         self.embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 
         self.tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-base")
-        self.model_llm = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base")
+        self.model_llm = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-base").to("cpu")
 
         documents = []
         doc_names = []
@@ -35,7 +35,7 @@ class RAGEngine:
                 self.all_chunks.append(chunk)
                 self.chunk_sources.append(i)
 
-        embeddings = self.embed_model.encode(self.all_chunks)
+        embeddings = self.embed_model.encode(self.all_chunks, normalize_embeddings=True)
         embeddings = np.array(embeddings).astype("float32")
 
         dim = embeddings.shape[1]
@@ -64,7 +64,7 @@ class RAGEngine:
 
     def ask(self, question):
 
-        query_embedding = self.embed_model.encode([question])
+        query_embedding = self.embed_model.encode([question], normalize_embeddings=True)
         query_embedding = np.array(query_embedding).astype("float32")
 
         k = min(3, len(self.all_chunks))
@@ -89,7 +89,7 @@ Question:
 Write a clear explanation in 3 sentences.
 """
 
-        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True).to("cpu")
 
         outputs = self.model_llm.generate(
             **inputs,
